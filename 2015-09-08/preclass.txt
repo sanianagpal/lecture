@@ -21,30 +21,45 @@ something into an already-full cache.
 1. Suppose 16N is significantly larger than the size of our L3 cache. What is
 the memory-based AI of this code? (Hint: What is the memory-based AI of just the
 innermost loop?)
-
+Arithmetic intesity = 2 flops/2 memory access = 1 flop/ memory access = 1/8 flop/byte
 
 2. Now suppose that the cache is substantially larger than 16N, but
 substantially smaller than 8N^2. What is the AI now?
-
+Arithmetic intesity = 2 flops/1 memory access = 1/4 flop/byte
 
 3. Now suppose the cache is large enough to hold all of A, B, and C. What is the
 AI now? (Hint: Writing to a byte of memory not already in the cache incurs two
 memory transfers: one to move the data to the cache for writing, and one to move
 the written data back to main memory.)
-
+Arithmetic Intensity = 2*n*n*n flops/ 2 * n * 2 memory access = n flops/memeory access = (n/8) flops/byte
 
 4. Cache overflowing. On my CPU (Intel i7-4700 HQ), L1, L2, and L3 caches are 32
 KB, 256 KB, and 6 MB respectively. What is the largest problem size N that will
 fit in each cache? What is the arithmetic intensity associated with each problem
 size?
 
+L1 cache:
+   For the two matrices to fit, 2*N*N*8 bytes <= 32 KB (2^15 bytes)
+   N^2 <= 2^11 => N = 45
+L2 cache:
+   For the two matrices to fit, 2*N*N*8 bytes <= 256 KB (2^18 bytes)
+   N^2 <= 2^14 => N = 128
+L2 cache:
+   For the two matrices to fit, 2*N*N*8 bytes <= 6 MB (6*2^20 bytes)
+   N^2 <= 3*2^17 => N = 627
+Since in all these cases, the matrices completely fit in the cache, the arithmetic intensity = n flops/memory access
 
 5. My CPU has 4 cores, each of which can do 8 fused multiply-adds per cycle, has
 a clock rate of 2.4 GHz, and a memory bandwidth of 25.6 GB/s. At what arithmetic
 intensity does my machine become CPU-bound?
 
+Maximum flops/sec = 4 cores * 8 FMA * 2 flops * 2.4 = 153.6 Gflops/sec
+Arithmetic Intensity = 153.6/25.6 flops/byte = 6 flops/byte
 
 6. So, for what size range for N will naive matmul be CPU-bound on my machine?
 
 
 7. So, what will a plot of Flops/sec vs N look like?
+ Initially the graph would be linear with slope = 1, because arithmetic intensity will be equal to N i.e. there will be no cache misses
+ After a point, the graph drops and now the value is close to 2, at this point one row can be accomodated in the cache.
+ Later, the graph drops further to 1, when the problem size becomes quite larger than the cache size. It remains constant thereafter.
