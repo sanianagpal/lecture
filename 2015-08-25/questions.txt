@@ -17,7 +17,43 @@ In practice, this took X time.  This includes
 
 Consider the following questions:
 
-1. What is a simple model that would predict this time?
-2. What about a simple model to predict time for one person to count?
-3. How big should the class be before the parallel method takes less time?
+Assumptions:
+(1). There are m students in each row (and n rows), total students therefore = n*m
+(2). Time to start the process = alpha for both serial and parallel methods. (However, in actual this value for serial method will definitely be less than parallel, but for simplicity let's assume they are same.)
+(3). Time taken for gathering each count is constant = beta.
+(4). Time taken for every arithmetic addition is constant = gamma.
+(5). In serial method, the instructor himself counts. Hence, time to gather count = 0
 
+
+1. What is a simple model that would predict this time?
+Time to start the process = alpha
+No. of rows = n
+No. of students in each row = m (atmost)
+Time for the instructor to gather one count = beta, total time for gathering counts = n * beta
+Time taken for one arithmentic addition = gamma, total time for arithmetic = (n-1) * gamma ~ n * gamma
+
+Since m is the maximum count in a row,
+if n students are parallely counting students in a row,
+the worst case is the total time taken which m in this case.
+Total time to compute row counts = m 
+
+Total time taken = alpha + m + n * (beta + gamma)
+
+
+2. What about a simple model to predict time for one person to count?
+Time to start the process = alpha
+Let's assume there are (atmost)m students in each row and there are n rows,
+so the worst case would be m students in each row and total n*m students
+
+Time to count the number of students = n * m
+Total time taken = n*m + alpha
+
+
+3. How big should the class be before the parallel method takes less time?
+For parallel method to take lesser time:
+alpha + m + n * (beta + gamma) < n*m + alpha
+n * (beta + gamma) < (n-1) * m
+m * (n-1)/n > (beta+gamma)              ---(considering n-1 ~ n)
+=> m > (beta+gamma)
+Therefore, for the parallel method to be faster,
+number of students in each row should be more than the combined time to gather a single count and doing one arithmetic addition

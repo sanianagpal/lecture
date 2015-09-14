@@ -8,13 +8,26 @@
     you should use a script to produce this plot, with both the serial
     fraction and the maximum number of cores as parameters.
 
+alpha = 0.1
+Speedup = 1/ (alpha + (1-alpha)/p) = 1/(.1 + .9 /128) = 9.34 (best speedup that can be achieved)
+Efficiency = 9.34/128 = 0.073
+
+As per the plot between no. of cores and speedup, (with serial overhead as 10%) the speedup initially increases with increase in no. of cores, but after a while the increase becomes negligible. This point (where the increase is no more very steep) is close to 40 cores.
+
 2.  Suppose a particular program can be partitioned into perfectly
     independent tasks, each of which takes time tau.  Tasks are
     set up, scheduled, and communicated to p workers at a (serial)
     central server; this takes an overhead time alpha per task.
     What is the theoretically achievable throughput (tasks/time)?
-
+    
+    Time to complete p tasks = tau + p * alpha
+    Throughput = tasks/time = p/(tau+p*alpha)
+    
 3.  Under what circumstances is it best to not tune?
+    (a). If the time that would be spent on tuning is huge compared to the performance gain (i.e. the computation time saved)
+    (b). If the code you are trying to tune is not taking much time out of the whole computation time, it's not worth tuning.
+    	 Tuning should be done on the computational bottlenecks which are taking huge chunks of time.
+    (c). If tuning leads to messing up the code	a lot, it's not worth it. You have to weigh between the maintainability and design of the code		v/s the performance gain. 
 
 4.  The class cluster consists of eight nodes and fifteen Xeon Phi
     accelerator boards.  Based on an online search for information on
@@ -23,5 +36,36 @@
     you computed this, and give URLs for where you got the parameters
     in your calculation.  (We will return to this question again after
     we cover some computer architecture.)
-    
+
+    Accelerator: Intel® Xeon Phi™ Coprocessor 5110P
+    http://ark.intel.com/products/71992/Intel-Xeon-Phi-Coprocessor-5110P-8GB-1_053-GHz-60-core
+    IMIC instruction set => 512-bit registers ---- https://software.intel.com/en-us/node/513448
+    512-bit vector FMA => 8 FMA/cycle (double precison) => 16 flops/cycle    (2 flops/FMA)
+    #cores = 60
+    Processor base frequency = 1.053 GHz
+    Theoretical peak flop rate (for one Xeon Phi)= 60 * 16 *1.053 Gflops/sec = 1010.8 Gflops/sec = 1.011 Teraflops/sec
+    The cluster has 15 Xeon Phis
+    So Theoretical peak flop rate for all of them = 1.011 * 15 = 15.163 Teraflops/sec
+
+    Intel® Xeon® Processor E5-2620 v3
+    http://ark.intel.com/products/83352/Intel-Xeon-Processor-E5-2620-v3-15M-Cache-2_40-GHz
+    AVX2.0 instruction set => 256-bit registers ---- https://en.wikipedia.org/wiki/Advanced_Vector_Extensions
+    256-bit vector FMA => 4 FMA/cycle (double precison) => 8 flops/cycle    (2 flops/FMA)
+    #cores = 6
+    Processor base frequency = 2.4 GHz
+    Theoretical peak flop rate (for one Xeon)= 6 * 8 * 2.4 Gflops/sec = 115.2 Gflops/sec 
+    The cluster has 8*12 Xeons
+    So Theoretical peak flop rate for all of them = 115.2 * 8 * 12 = 11.059 Teraflops/sec
+
+    Total Theoretical peak flop rate for the cluster = 15.163 (Xeon Phis)+ 11.059 (Xeons) = 26.222 Teraflops/sec   
+
 5.  What is the approximate theoretical peak flop rate for your own machine?
+    Processor: Intel Core i5-5200U
+    http://ark.intel.com/products/85212/Intel-Core-i5-5200U-Processor-3M-Cache-up-to-2_70-GHz
+    AVX2.0 instruction set => 4 FMA/cycle (double precision) = 8 flops/cycle
+    SSE4.1/4.2 instruction set => 18-bit => 2 FMA/cycle = 4 flops/cycle
+    #cores = 2
+    Processor base frequency = 2.2GHz
+    Theoretical peak flop rate = 2 * 12 * 2.2 Gigaflops/sec = 52.8 Gigaflops/sec
+    
+     

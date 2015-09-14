@@ -11,12 +11,51 @@ with questions for class!
     you computed this, and give URLs for where you got the parameters
     in your calculation.  (We will return to this question again after
     we cover some computer architecture.)
-    
-2.  What is the approximate theoretical peak flop rate for your own machine?
 
+    Accelerator: Intel® Xeon Phi™ Coprocessor 5110P
+    http://ark.intel.com/products/71992/Intel-Xeon-Phi-Coprocessor-5110P-8GB-1_053-GHz-60-core
+    IMIC instruction set => 512-bit registers ---- https://software.intel.com/en-us/node/513448
+    512-bit vector FMA => 8 FMA/cycle (double precison) => 16 flops/cycle    (2 flops/FMA)
+    #cores = 60
+    Processor base frequency = 1.053 GHz
+    Theoretical peak flop rate (for one Xeon Phi)= 60 * 16 *1.053 Gflops/sec = 1010.8 Gflops/sec = 1.011 Teraflops/sec
+    The cluster has 15 Xeon Phis
+    So Theoretical peak flop rate for all of them = 1.011 * 15 = 15.163 Teraflops/sec
+
+    Intel® Xeon® Processor E5-2620 v3
+    http://ark.intel.com/products/83352/Intel-Xeon-Processor-E5-2620-v3-15M-Cache-2_40-GHz
+    AVX2.0 instruction set => 256-bit registers ---- https://en.wikipedia.org/wiki/Advanced_Vector_Extensions
+    256-bit vector FMA => 4 FMA/cycle (double precison) => 8 flops/cycle    (2 flops/FMA)
+    #cores = 6
+    Processor base frequency = 2.4 GHz
+    Theoretical peak flop rate (for one Xeon)= 6 * 8 * 2.4 Gflops/sec = 115.2 Gflops/sec 
+    The cluster has 8*12 Xeons
+    So Theoretical peak flop rate for all of them = 115.2 * 8 * 12 = 11.059 Teraflops/sec
+
+    Total Theoretical peak flop rate for the cluster = 15.163 + 11.059 = 26.222 Teraflops/sec   
+
+
+2.  What is the approximate theoretical peak flop rate for your own machine?
+    Processor: Intel Core i5-5200U
+    http://ark.intel.com/products/85212/Intel-Core-i5-5200U-Processor-3M-Cache-up-to-2_70-GHz
+    AVX2.0 instruction set => 4 FMA/cycle (double precision) = 8 flops/cycle
+    SSE4.1/4.2 instruction set => 18-bit => 2 FMA/cycle = 4 flops/cycle
+    #cores = 2
+    Processor base frequency = 2.2GHz
+    Theoretical peak flop rate = 2 * 12 * 2.2 Gigaflops/sec = 52.8 Gigaflops/sec
+     
 3.  Suppose there are t tasks that can be executed in a pipeline
     with p stages.  What is the speedup over serial execution of the
     same tasks?
+    Assuming each task takes 1 sec per stage.
+    When run serially, each task takes p seconds to finish then the next task follows.
+    So, Tserial = p * t
+
+    When the tasks are pipelined, the first one would take p second to finish
+    and then further (t-1) tasks will take t-1 seconds)
+    So, Tpipeline = p + t -1 
+
+    Speedup = (p*t) / (p+t-1)
 
 4.  Consider the following list of tasks (assume they can't be pipelined):
 
@@ -31,6 +70,16 @@ with questions for class!
     a compiled application?  What is the minimum parallel time given
     an arbitrary number of processors?
 
+    Tserial = Sum of the time taken for each compilation = 1+0.5+0.25+0.5+0.5
+    	    = 2.75 hours
+
+    When they are run parallely on different processors:
+    1 hour for GCC compilaion, because everything else is dependent on it.
+    0.5 hours for OpenMPI compilation. Parallel to OpenMPI, OpenBLAS can be compiled followed by LAPACK.
+    0.25 hours additional for OpenBLAS and LAPACK being compiled on different processor. (Thier total time is 0.75 hours)
+    0.5 hours for application compilation, because this is dependent on all others, hence will start only after everything else is compiled
+    Therefore, Tparallel = 2.25 hours.
+    
 5.  Clone the membench repository from GitHub:
 
        git clone git@github.com:cornell-cs5220-f15/membench.git
@@ -43,6 +92,12 @@ with questions for class!
     timings-heat.pdf; what can you tell about the cache architecture
     on your machine from the plot?
 
+    When the size of array is extremely small, the size of the strides doesnot make a difference, because they would anyways fit the cache.
+    
+    As the array size increases, cache misses keep increasing with increase in strides and the worst case is 1 MB stride and 64 MB array size where maximum number of misses occur when there are memory load requests from addresses mapped to the same cache.
+
+    When the stride length is further increased, the memory accesses are from different cache blocks, and hence there are less number of cache misses.
+
 6.  From the cloned repository, check out the totient branch:
 
        git checkout totient
@@ -52,6 +107,10 @@ with questions for class!
     way, repeat the exercise of problem 5.  What can you tell about
     the cache architecture of the totient nodes?
 
+    Totient cluster:
+    L1 cache misses start occuring close to 4 KB stride length. This is for array size 32 MB.
+    As stride length further increases, L2 cache misses also start to occur, and hence performance further deteriorates and reaches the worst value at close to 1 MB stride length. As stride length is further increased, performance improves since subsequent memory accesses are from different addresses in cache.
+    
 7.  Implement the following three methods of computing the centroid
     of a million two-dimensional coordinates (double precision).
     Time and determine which is faster:
@@ -69,3 +128,28 @@ with questions for class!
     compiler.  To do this, run "module load cs5220" and run (e.g.)
 
         icc -o centroid centroid.c
+
+
+	Results on my laptop (using gcc)
+		Result: 1.07382e+09 1.07378e+09
+		Version 1: 7.912067e-02 (0.505557 GFLop/s)
+		Result: 1.07382e+09 1.07378e+09
+		Version 2: 1.566935e-01 (0.255275 GFLop/s)
+		Result: 1.07383e+09 1.07378e+09
+		Version 3: 1.538311e-01 (0.260025 GFLop/s)
+
+	Results on cluster (using gcc)
+		Result: 1.07382e+09 1.07378e+09
+		Version 1: 8.161032e-02 (0.490134 GFLop/s)
+		Result: 1.07382e+09 1.07378e+09
+		Version 2: 1.515196e-01 (0.263992 GFLop/s)
+		Result: 1.07383e+09 1.07378e+09
+		Version 3: 1.475346e-01 (0.271123 GFLop/s)
+
+	Results on cluster (using icc)
+		Result: 1.07382e+09 1.07378e+09
+		Version 1: 3.477000e-02 (1.15042 GFLop/s)
+		Result: 1.07382e+09 1.07378e+09
+		Version 2: 5.606601e-02 (0.713445 GFLop/s)
+		Result: 1.07383e+09 1.07378e+09
+		Version 3: 2.801470e-02 (1.42782 GFLop/s)
