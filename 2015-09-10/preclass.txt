@@ -3,12 +3,35 @@
    host cores are used, for the moment).  How do things change with
    the addition of the two Phi boards?
 
+   The roofline diagram increases linearly initially until reaches a peak point
+   after which it reamains almost constant.
+
+                672 GFlop/sec
+            |    \
+	    |     _________________
+GFLOP/sec   |    /
+	    |   /
+	    |  /
+	    | /
+	    |/____________________
+	     Arithmentic Intensity
+	     FLOP/Byte
+
+ 12 coes * 3.5GHz * 4 FMA/vector * 2 Flop/FMA * 2 = 672
+ With the addition of Phi Boards , the structre of graph will remain same
+ just that the peak flop rate point will move up and towards right.
+
 2. What is the difference between two cores and one core with
    hyperthreading?
+   With two cores, there are processes running on two diffrent sets of computational resources
+   However, with hyperthreading on one core, the CPU is just scheduling them in a way that
+   when the first one is waiting on something (I/O operations etc.), the second one runs during that time.
 
 3. Do a Google search to find a picture of how memories are arranged
    on the Phi architecture.  Describe the setup briefly in your own
    words.  Is the memory access uniform or non-uniform?
+   Each core has its own L1 and L2 cache and they are all connected in a ring via address bus.
+   https://software.intel.com/sites/default/files/opencl-figure-1.png
 
 4. Consider the parallel dot product implementations suggested in the
    slides.  As a function of the number of processors, the size of the
@@ -17,3 +40,8 @@
    [Note that dot products have low arithmetic intensity -- the
     roofline model may be useful for reasoning about the peak
     performance for computing pieces of the dot product]
+    
+    Each processor can individually compute a partial sum and send to the main processor
+    where they can be added up. Initially there would be a good speedup with increase in the
+    problem size but might become constant after a while because adding them all
+    at the main machine would be bottleneck and the vector size is constant as well.
