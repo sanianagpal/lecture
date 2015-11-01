@@ -2,6 +2,7 @@
 
 1.  What are one or two points that you found least clear in the
     10/08 slide decks (including the narration)?
+    
 
 2.  Now that we are now basically a third of the way into the
     semester, and are (mostly) settled into the steady pace of things,
@@ -10,12 +11,24 @@
     particularly useful -- venting about the cluster, for example, is
     understandable but doesn't help me that much in adjusting!
 
+    a little more elaboration in the slides and narration would be helpful
+    especially the ones containing numerical methods and all.
+
+    The pattern of the class is nice that the lecture time is devoted to discussions only
+    but if ever because of project deadlines or so, you don't get time to go through the preclass
+    material, you pretty much struggle in the class. But then the positive is this compels you
+    to cover that material (and for the next class) soon so as to prevent lot of backlog.
+    
 3.  The ring demo implements the protocol described in the particle
     systems slide deck from 9/15:
 
     http://cornell-cs5220-f15.github.io/slides/2015-09-15-particle.html#/11
 
     a) In your own words, describe what ring.c is doing.
+       Every processor computes some particle data on its own, and passes it on the next processor
+       The next processor on receiving the data, does some calculations of its own and
+       passes the data to next and so on. So this goes on for the number of processors.
+
 
     b) How might you modify the code to have the same computational
        pattern, but using non-blocking communication rather than
@@ -23,3 +36,6 @@
        one isn't supposed to read from a buffer that is being
        handled by a non-blocking send, so it is probably necessary
        to use three temporary buffers rather than the current two.
+
+       MPI_Isend and MPI_Irecv could be used seperately with wait and test operations
+       

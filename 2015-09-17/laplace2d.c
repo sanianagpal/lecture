@@ -11,7 +11,7 @@ double u(double x, double y)
 double laplacian_u(double (*u)(double x, double y),
                    double h, double x, double y)
 {
-    /* Fill in the solution here */
+  return ((4*u(x,y) - (u(x+h,y) + u(x-h,y) + u(x,y+h) + u(x,y-h))) * pow(h, -2)); 
 }
 
 

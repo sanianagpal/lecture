@@ -1,7 +1,9 @@
 0.  How much time did you spend on this pre-class exercise, and when?
-
+    around 1 hour in october
+        
 1.  What are one or two points that you found least clear in the
     10/06 slide decks (including the narration)?
+    none
 
 2.  In the upcoming lecture (10/8), we will discuss how to model
     latency and bandwidth of MPI sends and receives using the
@@ -13,6 +15,29 @@
        if everything is correct, you should see the Intel MPI version
        (under /usr/local/intel).  Using this version of MPI and the
        default PBS files, run the pingpong examples (demo/pingpong).
+-bash-4.1$ which mpicc
+/usr/local/intel/impi/5.0.3.048/intel64/bin/mpicc
+
+1 7.0594e-07
+1001 1.32223e-06
+2001 1.62773e-06
+3001 2.10043e-06
+4001 2.43309e-06
+5001 2.80638e-06
+6001 3.1399e-06
+7001 3.4883e-06
+8001 3.88569e-06
+9001 4.22041e-06
+10001 4.54727e-06
+11001 4.87168e-06
+12001 5.26197e-06
+13001 5.62191e-06
+14001 6.02539e-06
+15001 6.28464e-06
+16001 6.68919e-06
+
+
+
 
     b) Now do "module load openmpi/1.10.0-icc-15.0.3" after loading
        the CS 5220 module.  Check by typing "which mpicc" that you
@@ -20,8 +45,34 @@
        OpenMPI, and re-run the on-node tests using OpenMPI (note:
        you will have to add a module load to the start of the PBS
        scripts).  How do the timings differ from the Intel MPI timings?
+-bash-4.1$ module load openmpi/1.10.0-icc-15.0.3
+-bash-4.1$ which mpicc
+/share/apps/openmpi-1.10.0-icc-15.0.3/bin/mpicc
+1 7.2232e-07
+1001 1.31202e-06
+2001 1.6415e-06
+3001 2.10443e-06
+4001 2.45718e-06
+5001 2.79055e-06
+6001 3.14002e-06
+7001 3.50821e-06
+8001 3.91131e-06
+9001 4.22214e-06
+10001 4.54658e-06
+11001 4.87577e-06
+12001 5.28007e-06
+13001 5.60926e-06
+14001 5.93953e-06
+15001 6.30806e-06
+16001 6.75585e-06
+
+
 
     c) When running at the peak rate (e.g. 16 double precision
        flops/cycle), how many (double precision) floating point ops
        could two totient cores do in the minimal time required for one
        MPI message exchange?
+
+       Peak flop rate = 16 * 2 cores * 2.4 GHz = 76.8 Gflop/sec
+       Minimal time = 7.2232e-07
+       flops = 7.2232e-07 * 76.8 Gflop/sec = 5.5474e-05 Gflops = 55474 flops 

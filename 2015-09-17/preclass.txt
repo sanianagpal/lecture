@@ -5,10 +5,14 @@ than on the numerical analysis, but I am working under the assumption
 that you can figure out the numerical jargon.
 
 0.  How much time did you spend on this pre-class exercise, and when?
-
+    close to 1 hour (the laplace problem took some time), looked at them in september
+    completed in october
+    
 1.  What are one or two points that you found least clear in the
     9/17 slide decks (including the narration)?
 
+    Parabolic differential equations
+    
 2.  Fill in the most straightforward implementation you can think of
     for multiplying a compressed sparse row matrix by a vector.
     Note: It is fine to look up the answer elsewhere!  If you do,
@@ -27,6 +31,9 @@ that you can figure out the numerical jargon.
           /* Fill in here */
       } 
 
+    ->  Could figure it myself from the slides
+
+
 3.  From the slides, complete the following short code:
 
       double laplacian_u(double (*u)(double x, double y),
@@ -39,6 +46,7 @@ that you can figure out the numerical jargon.
     laplacian_u is a C function pointer -- within the function,
     it can be called in the same way as an ordinary function (i.e.
     u(x,y)).  See the laplace2d.c code in this directory as an example.
+    
 
 4.  In one space dimension, the following numerical scheme
     approximately solves the wave equation
